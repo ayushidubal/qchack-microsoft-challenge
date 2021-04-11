@@ -1,6 +1,7 @@
 namespace QCHack.Task3 {
     open Microsoft.Quantum.Canon;
     open Microsoft.Quantum.Intrinsic;
+    open Microsoft.Quantum.Math;
 
     // Task 3 (5 points). f(x) = 1 if at least two of three input bits are different - hard version
     //
@@ -23,8 +24,57 @@ namespace QCHack.Task3 {
     // Warning: some library operations, such as ApplyToEach, might count as multi-qubit gate,
     // even though they apply single-qubit gates to separate qubits. Make sure you run the test
     // on your solution to check that it passes before you submit the solution!
-    operation Task3_ValidTriangle (inputs : Qubit[], output : Qubit) : Unit is Adj+Ctl {
-        // ...
+    operation Task3_ValidTriangle (inputs : Qubit[], output : Qubit) : Unit is Adj+Ctl 
+    {
+        // abc   x
+        // 000 - 0     
+        // 001 - 0  
+        // 010 - 1  
+        // 011 - 1  
+        // 100 - 1  
+        // 101 - 1  
+        // 110 - 0  
+        // 111 - 0  
+
+        // 00 - 1
+        // 01 - 0
+        // 10 - 0
+        // 11 - 1
+
+        X(inputs[0])
+        X(inputs[1])
+        X(inputs[2])
+        X(output)
+        Controlled X([inputs[0]], output)
+        X(output)
+        Controlled X([inputs[1], inputs[2]], output)
+        
+        X(inputs[0])
+        X(inputs[1])
+        X(inputs[2])
+
+        X(output)
+        Controlled X([inputs[0]], output)
+        X(output)
+        
+        let p = PI();
+
+        // CCX 
+        R(PauliX, 0.5*p, output);
+        Controlled X([inputs[2]], output);
+        Adjoint T(output);
+        Controlled X([inputs[1]], output);
+        Adjoint T(output);
+        Controlled X([inputs[2]], output);
+        T(inputs[2]);
+        Adjoint T(output);
+        Controlled X([inputs[1]], output);
+        Controlled X([inputs[1]], inputs[2]);
+        T(output);
+        T(inputs[1]);
+        Adjoint T(inputs[2]);
+        R(PauliX, 0.5*p, output);
+        Controlled X([inputs[1]], inputs[2]);
     }
 }
 
